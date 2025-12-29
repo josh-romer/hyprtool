@@ -56,7 +56,7 @@
 
         # Build the actual crate itself, reusing the dependency
         # artifacts from above.
-        my-crate = craneLib.buildPackage (
+        hyprtool = craneLib.buildPackage (
           commonArgs
           // {
             inherit cargoArtifacts;
@@ -66,7 +66,7 @@
       {
         checks = {
           # Build the crate as part of `nix flake check` for convenience
-          inherit my-crate;
+          inherit hyprtool;
 
           # Run clippy (and deny all warnings) on the crate source,
           # again, reusing the dependency artifacts from above.
@@ -74,7 +74,7 @@
           # Note that this is done as a separate derivation so that
           # we can block the CI if there are issues here, but not
           # prevent downstream consumers from building our crate by itself.
-          my-crate-clippy = craneLib.cargoClippy (
+          hyprtool-clippy = craneLib.cargoClippy (
             commonArgs
             // {
               inherit cargoArtifacts;
@@ -82,7 +82,7 @@
             }
           );
 
-          my-crate-doc = craneLib.cargoDoc (
+          hyprtool-doc = craneLib.cargoDoc (
             commonArgs
             // {
               inherit cargoArtifacts;
@@ -93,30 +93,30 @@
           );
 
           # Check formatting
-          my-crate-fmt = craneLib.cargoFmt {
+          hyprtool-fmt = craneLib.cargoFmt {
             inherit src;
           };
 
-          my-crate-toml-fmt = craneLib.taploFmt {
+          hyprtool-toml-fmt = craneLib.taploFmt {
             src = pkgs.lib.sources.sourceFilesBySuffices src [ ".toml" ];
             # taplo arguments can be further customized below as needed
             # taploExtraArgs = "--config ./taplo.toml";
           };
 
           # Audit dependencies
-          my-crate-audit = craneLib.cargoAudit {
+          hyprtool-audit = craneLib.cargoAudit {
             inherit src advisory-db;
           };
 
           # Audit licenses
-          my-crate-deny = craneLib.cargoDeny {
+          hyprtool-deny = craneLib.cargoDeny {
             inherit src;
           };
 
           # Run tests with cargo-nextest
-          # Consider setting `doCheck = false` on `my-crate` if you do not want
+          # Consider setting `doCheck = false` on `hyprtool` if you do not want
           # the tests to run twice
-          my-crate-nextest = craneLib.cargoNextest (
+          hyprtool-nextest = craneLib.cargoNextest (
             commonArgs
             // {
               inherit cargoArtifacts;
@@ -128,11 +128,11 @@
         };
 
         packages = {
-          default = my-crate;
+          default = hyprtool;
         };
 
         apps.default = flake-utils.lib.mkApp {
-          drv = my-crate;
+          drv = hyprtool;
         };
 
         devShells.default = craneLib.devShell {
