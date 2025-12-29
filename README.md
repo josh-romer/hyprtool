@@ -9,7 +9,7 @@ A Hyprland utility cli tool intended primarily for personal use. Currently only 
 ```nix
 {
   inputs.hyprtool.url = "github:josh-romer/hyprtool";
-  inputs.hyprtool.inputs.follows = "nixpkgs";
+  inputs.hyprtool.inputs.nixpkgs.follows = "nixpkgs";
 }
 ```
 
